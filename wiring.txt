@@ -1,0 +1,10 @@
+NSS -- purple --> 15
+MOSI -- green --> 13
+MISO -- blue ---> 12
+SCK --- yellow -> 14
+DIO1 --- grey --> 2
+NRST -- orange -> 4
+
+OLED:
+SDA -- green --> 21
+SCL -- yellow -> 22
