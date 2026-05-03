@@ -23,7 +23,7 @@ SX1262 radio = new Module(NSS_PIN, DIO1_PIN, NRST_PIN, RADIOLIB_NC, hspi);
 
 volatile bool receivedFlag = false;
 
-void display_data(float rssi, float snr, int packet, int overall_packets, int packets_lost);
+void display_data(float rssi, float snr, String packet, int overall_packets, int packets_lost);
 
 ICACHE_RAM_ATTR void setFlag(void) {
   receivedFlag = true;
@@ -103,7 +103,7 @@ void loop() {
     Serial.print(radio.getFrequencyError());
     Serial.println(" Hz");
 
-    int received_now = str.toInt();
+    int received_now = str.substring(3).toInt();
 
     int diff = received_now - last_received - 1;
     if (diff > 0 && first_packet_received) {
@@ -116,11 +116,11 @@ void loop() {
       first_packet_received = true;
     }
 
-    display_data(radio.getRSSI(), radio.getSNR(), received_now, overall_received, lost_packets);
+    display_data(radio.getRSSI(), radio.getSNR(), str, overall_received, lost_packets);
   }
 }
 
-void display_data(float rssi, float snr, int packet, int overall_packets, int packets_lost) {
+void display_data(float rssi, float snr, String packet, int overall_packets, int packets_lost) {
   int16_t x, y;
   uint16_t w, h;
   
@@ -129,16 +129,22 @@ void display_data(float rssi, float snr, int packet, int overall_packets, int pa
   display.setCursor(0, 0);
 
   display.print((int)rssi);
-  display.print(" ");
 
   display.setTextSize(1);
-  if (snr < 0) {
+  if (snr <= -15) {
+    display.print("LOST");
+  } else if (snr > -15 && snr <= -10) {
     display.print("BAD");
-  } else if (snr > 0 && snr < 5) {
+  } else if (snr > -10 && snr <= -5) {
+    display.print("WEAK");
+  }else if (snr > -5 && snr <= 0) {
     display.print("OK");
-  } else if (snr >= 5) {
+  }else if (snr > 0 && snr <= 5) {
     display.print("GOOD");
+  }else if (snr > 5) {
+    display.print("GREAT");
   }
+
   display.setTextSize(2);
 
   String snr_str = String(snr);
@@ -148,7 +154,6 @@ void display_data(float rssi, float snr, int packet, int overall_packets, int pa
   display.println(snr_str);
 
   display.print(overall_packets);
-  display.print(" ");
   display.setTextSize(1);
   display.print(packet);
   display.setTextSize(2);

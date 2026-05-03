@@ -38,11 +38,11 @@ void setup() {
 
   radio.setPacketSentAction(setFlag);
 
-  Serial.print("Sending packet: ");
+  Serial.print("Sending packet: MA ");
   Serial.println(count);
 
   String str = String(count);
-  transmissionState = radio.startTransmit(str);
+  transmissionState = radio.startTransmit("MA" + str);
 }
 
 void loop() {
@@ -56,7 +56,7 @@ void loop() {
 
     radio.finishTransmit();
 
-    delay(1000);
+    delay(10000);
 
     count++;
 
@@ -64,6 +64,6 @@ void loop() {
     Serial.println(count);
 
     String str = String(count);
-    transmissionState = radio.startTransmit(str);
+    transmissionState = radio.startTransmit("MA" + str);
   }
 }
